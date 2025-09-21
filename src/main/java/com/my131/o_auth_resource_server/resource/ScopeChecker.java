@@ -6,6 +6,10 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
+/**
+ *  JWT 기반 리소스 서버의 접근 제어 로직을 구현
+ *  세밀한 권한 검사를 수행
+ */
 @Component
 public class ScopeChecker {
     // 접근 권한 확인
@@ -16,7 +20,7 @@ public class ScopeChecker {
         if(!(auth instanceof JwtAuthenticationToken jwtAuth)) {
             return false;
         }
-        // jwtAuth.getToken() 은 Spring Security가 SecurityContext에 넣어준 인증 객체에서 JWT 원본을 꺼내는 동
+        // jwtAuth.getToken = Spring Security가 SecurityContext에 넣어준 인증 객체에서 JWT 원본을 꺼냄
         Jwt jwt = jwtAuth.getToken();
 
         // 관리자 스코프 있으면 무조건 허용
@@ -34,7 +38,7 @@ public class ScopeChecker {
         return false;
     }
 
-    // 수정 권한 확인
+    // 전체 사용자 수정 권한 확인
     public boolean canModifyUser(Long userId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 

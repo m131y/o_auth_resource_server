@@ -11,17 +11,24 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Base64;
 
+/**
+ * RSA 키 쌍(public key / private key)을 생성하는 유틸리티 클래스
+ */
 @Slf4j
 public class KeyGenerator {
     public static void main(String[] args) throws NoSuchAlgorithmException, IOException {
+        //  RSA 알고리즘으로 설정
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
 
+        // 키의 길이를 2048비트로 설정
         keyPairGenerator.initialize(2048);
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
 
+        // 개인키, 공개키 추출
         RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
         RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
 
+        // 각각 private.pem, public.pem으로 저장
         String privateKeyContent = "-----BEGIN PRIVATE KEY-----\n" +
                 Base64.getEncoder().encodeToString(privateKey.getEncoded()) + "\n" +
                 "-----END PRIVATE KEY-----";

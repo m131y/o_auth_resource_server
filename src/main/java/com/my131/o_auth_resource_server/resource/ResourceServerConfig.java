@@ -25,6 +25,9 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
+/**
+ * 리소스 서버의 메인 보안 설정 파일
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -41,6 +44,7 @@ public class ResourceServerConfig {
                         auth -> auth
                                 .requestMatchers("/oauth/**").permitAll()
                                 .requestMatchers("/h2-console/**").permitAll()
+                                // 권한이 있어야 접근 가능
                                 .requestMatchers(HttpMethod.GET, "/api/users/**")
                                 .hasAuthority("SCOPE_read:users")
                                 .requestMatchers(HttpMethod.POST, "/api/users/**")
@@ -49,6 +53,7 @@ public class ResourceServerConfig {
                                 .hasAuthority("SCOPE_admin")
                                 .anyRequest().authenticated()
                 )
+                // OAuth 2.0 리소스 서버 기능을 활성화, JWT를 사용
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt
                                 .decoder(jwtDecoder())
@@ -59,6 +64,7 @@ public class ResourceServerConfig {
                 .build();
     }
 
+    // JWT의 서명을 검증하는 디코더 생성
     @Bean
     public JwtDecoder jwtDecoder() {
         try {
@@ -73,6 +79,7 @@ public class ResourceServerConfig {
         return getRsaPublicKey(publickeyResource);
     }
 
+    // 파일로부터 PEM 형식의 문자열을 읽어와 자바의 RSAPublicKey 객체로 변환
     public static RSAPublicKey getRsaPublicKey(Resource publickeyResource) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         String content = new String(Files.readAllBytes(publickeyResource.getFile().toPath()));
         String publicKeyPEM = content
@@ -86,6 +93,7 @@ public class ResourceServerConfig {
         return (RSAPublicKey) factory.generatePublic(spec);
     }
 
+    // JWT의 클레임을 Spring Security의 권한으로 변환하는 방법을 정의
     @Bean
     // JWT의 scope 클레임 → Spring Security의 GrantedAuthority("SCOPE_xxx") 로 매핑
     // scope: "read:users write:users" → [SCOPE_read:users, SCOPE_write:users]

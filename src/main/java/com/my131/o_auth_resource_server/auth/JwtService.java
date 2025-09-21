@@ -41,11 +41,13 @@ public class JwtService {
         this.expiration = expiration;
     }
 
+    // JWT를 만드는 메서드
     public String generateToken(String username, Long userId, Set<String> scopes) {
         try {
             Instant now = Instant.now();
             Instant expiryTime = now.plusSeconds(expiration);
 
+            // claims 객체 생성
             JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                     .subject(username)
                     .issuer(issuer)
@@ -55,11 +57,15 @@ public class JwtService {
                     .expirationTime(Date.from(expiryTime))
                     .build();
 
+            // JWT의 뼈대를 만드는 역할
+            // 토큰에 들어갈 헤더(Header)와 클레임 세트(Claims Set)를 정의하여 JWT 객체를 초기화
             SignedJWT signedJWT = new SignedJWT(
+                    // JWSHeader: JWT의 헤더를 정의
                     new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
                     claimsSet
             );
 
+            // 개인키를 사용해 서명을 추가하여 최종적인 JWT 문자열을 완성
             signedJWT.sign(new RSASSASigner(privateKey));
             return signedJWT.serialize();
         } catch (Exception e) {
@@ -67,15 +73,20 @@ public class JwtService {
         }
     }
 
+    // 토큰 유효성 검증 메서드
     public boolean validateToken(String token) {
         try {
+            // JWT 문자열을 파싱하여 SignedJWT 객체로 변환
             SignedJWT signedJWT = SignedJWT.parse(token);
+            // verifier 객체 생성해 공개키 설정
             JWSVerifier verifier = new RSASSAVerifier(publicKey);
 
+            // 공개 키 서명이 유효하지 않으면 false 반환
             if (!signedJWT.verify(verifier)) {
                 return false;
             }
 
+            // 유효하다면 만료 시간 검증
             Date expirationTime = signedJWT.getJWTClaimsSet().getExpirationTime();
 
             return expirationTime.after(new Date());
@@ -84,6 +95,7 @@ public class JwtService {
         }
     }
 
+    // .pem 파일을 읽고 private 키 객체로 변환
     private RSAPrivateKey loadPrivateKey(Resource resource) throws Exception {
         String content = new String(Files.readAllBytes(resource.getFile().toPath()));
         String privateKeyPEM = content
@@ -97,6 +109,7 @@ public class JwtService {
         return (RSAPrivateKey) factory.generatePrivate(spec);
     }
 
+    // .pem 파일을 읽고 public 키 객체로 변환
     private RSAPublicKey loadPublicKey(Resource resource) throws Exception {
         String content = new String(Files.readAllBytes(resource.getFile().toPath()));
         String publicKeyPEM = content

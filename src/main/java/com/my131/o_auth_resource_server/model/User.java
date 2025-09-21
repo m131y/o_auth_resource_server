@@ -14,6 +14,10 @@ import java.util.Set;
 @AllArgsConstructor
 @Getter
 @Setter
+/**
+ * 애플리케이션의 사용자 정보를 담는 핵심 엔티티
+ * Set 컬렉션을 통해 다대다 관계 관리
+ */
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

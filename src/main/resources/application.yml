@@ -15,11 +15,11 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          # ???? ?? Authorization Server URL
-          # ???? ?? ?? ??? ?? ??
+          # 실제로는 별도 Authorization Server URL
+          # 여기서는 자체 서명 검증을 위해 로컬 파일 공개키 사용
           public-key-location: classpath:public.pem
 
-# JWT ??
+# JWT 설정
 jwt:
   private-key: classpath:private.pem
   public-key: classpath:public.pem
@@ -31,6 +31,6 @@ logging:
     org.springframework.security: DEBUG
     com.example.oauth_resource_server: DEBUG
 
-# ?? ?? ??
+# 서버 포트 설정
 server:
   port: 8080
